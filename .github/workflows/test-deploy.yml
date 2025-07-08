@@ -1,0 +1,56 @@
+name: Test Deploy Pipeline
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+jobs:
+  pre-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Pre-build Success
+        run: |
+          echo "Pre-build completed successfully!"
+          echo "Current time: $(date)"
+          
+  deploy:
+    runs-on: ubuntu-latest
+    needs: pre-build
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Check for failure trigger
+        run: |
+          if [ -f "FAIL_DEPLOY" ]; then
+            echo "FAIL_DEPLOY file found - triggering deployment failure"
+            exit 1
+          fi
+          echo "No failure trigger found - deployment proceeding"
+      - name: Simulate Deployment
+        run: |
+          echo "Deploying application..."
+          sleep 5
+          echo "Deployment completed successfully!"
+          
+  notify-failure:
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: failure()
+    steps:
+      - name: Send Email Notification
+        run: |
+          curl -X POST "https://api.resend.com/emails" \
+          -H "Authorization: Bearer ${{ secrets.RESEND_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+              "from": "githubaction@notifications.kingit.app",
+              "to": [
+                "viraj@kingitsolutions.net"
+              ],
+              "subject": "🚨 TEST: Deployment Failed - ${{ github.workflow }} on ${{ github.ref_name }}",
+              "html": "<h2>🚨 TEST Deployment Failure Alert</h2><p>The <strong>${{ github.workflow }}</strong> workflow failed on branch <strong>${{ github.ref_name }}</strong>.</p><p><strong>Repository:</strong> ${{ github.repository }}</p><p><strong>Commit:</strong> ${{ github.sha }}</p><p><strong>Triggered by:</strong> ${{ github.actor }}</p><p><strong>Check the logs:</strong> <a href=\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\">View Action Run</a></p><p><em>This is a test notification - you can safely ignore it.</em></p>"
+          }'
