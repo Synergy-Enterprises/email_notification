@@ -50,6 +50,7 @@ jobs:
               "from": "githubaction@notifications.kingit.app",
               "to": [
                 "viraj@kingitsolutions.net"
+                "lakshan@kingitsolutions.net"
               ],
               "subject": "🚨 TEST: Deployment Failed - ${{ github.workflow }} on ${{ github.ref_name }}",
               "html": "<h2>🚨 TEST Deployment Failure Alert</h2><p>The <strong>${{ github.workflow }}</strong> workflow failed on branch <strong>${{ github.ref_name }}</strong>.</p><p><strong>Repository:</strong> ${{ github.repository }}</p><p><strong>Commit:</strong> ${{ github.sha }}</p><p><strong>Triggered by:</strong> ${{ github.actor }}</p><p><strong>Check the logs:</strong> <a href=\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\">View Action Run</a></p><p><em>This is a test notification - you can safely ignore it.</em></p>"
