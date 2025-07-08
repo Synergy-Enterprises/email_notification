@@ -41,7 +41,7 @@ jobs:
     needs: [deploy]
     if: failure()
     steps:
-      - name: Send Email Notification
+      - name: Send Email Notification 
         run: |
           curl -X POST "https://api.resend.com/emails" \
           -H "Authorization: Bearer ${{ secrets.RESEND_API_KEY }}" \
